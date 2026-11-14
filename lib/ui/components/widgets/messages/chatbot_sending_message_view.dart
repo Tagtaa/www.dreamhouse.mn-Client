@@ -7,7 +7,8 @@ import '../../../../core/configs/theme/app_colors.dart';
 import '../../../../core/configs/theme/app_text_styles.dart';
 import '../../../../core/models/auth/api/messages/send/chat_message_model_data.dart';
 import '../../../../core/utils/extensions/size_extensions.dart';
-import '../custom_image_network.dart';
+import '../chat_image.dart';
+import '../emoji_text.dart';
 
 const double _messageBoxRadius = 15.0;
 
@@ -65,7 +66,7 @@ class ChatbotSendingMessageView extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.all(imageUrl == null ? AppSize.padding : AppSize.paddingLowest),
               child: switch (imageUrl == null) {
-                true => Text(
+                true => EmojiText(
                   chatMessageModel?.content ?? '',
                   style: AppTextStyles.labelSmall(
                     color: AppColors.chatBotMessageSendingTextColor,
@@ -74,7 +75,7 @@ class ChatbotSendingMessageView extends StatelessWidget {
                 ),
                 false => ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(_messageBoxRadius)),
-                  child: CustomImageNetwork(imageUrl!),
+                  child: ChatImage(imageUrl!),
                 ),
               },
             ),

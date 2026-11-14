@@ -13,6 +13,7 @@ import '../../../core/models/rx.dart';
 import '../../../core/services/auth/message/message_service.dart';
 import '../../../core/utils/extensions/size_extensions.dart';
 import '../../components/widgets/messages/chatbot_coming_message_view.dart';
+import '../../components/widgets/emoji_picker_sheet.dart';
 import '../../components/widgets/messages/chatbot_sending_message_view.dart';
 import '../../components/widgets/custom_back_button.dart';
 import '../../components/widgets/gesture_detector.dart';
@@ -105,8 +106,20 @@ class _ChatbotScreenViewState extends State<ChatbotScreenView> {
                   padding: const EdgeInsets.only(right: AppSize.padding),
                   child: CustomGestureDetector(onTap: controller.onTapImage, child: AppIcons.image_placeholder()),
                 ),
+                // Emoji picker (inserts at the cursor)
+                Padding(
+                  padding: const EdgeInsets.only(right: AppSize.paddingLow),
+                  child: Semantics(
+                    button: true,
+                    label: 'Эможи нэмэх',
+                    child: CustomGestureDetector(
+                      onTap: () => showEmojiPickerSheet(context, controller.messageController),
+                      child: const Icon(Icons.emoji_emotions_outlined, color: AppColors.chatBotTextColor, size: 26),
+                    ),
+                  ),
+                ),
                 Container(
-                  width: context.dw(0.7),
+                  width: context.dw(0.6),
                   constraints: const BoxConstraints(
                     maxHeight: 120,
                   ),
