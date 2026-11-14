@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "456185448976",
+    "project_id": "dreamhouse-77707",
+    "storage_bucket": "dreamhouse-77707.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:456185448976:android:949cb069d7c78589c95895",
+        "android_client_info": {
+          "package_name": "com.dhapp.dream_house"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_oQkHcQUcACxAuULF3nJRiLQ1KsfjoEE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
