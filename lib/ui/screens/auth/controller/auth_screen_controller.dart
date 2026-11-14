@@ -195,6 +195,7 @@ final class AuthScreenController extends BaseScreenController<AuthScreenArgs> {
                 context(),
                 sendToPhoneNumber: AppFunctions.sendToNumber,
                 verifyCode: AppFunctions.otpCode,
+                onCheck: checkSignupCodeVerified,
                 onVerify: () {
                   AppNavigation.gotoLoginPasswordRoute(
                     context(),
@@ -211,6 +212,22 @@ final class AuthScreenController extends BaseScreenController<AuthScreenArgs> {
       },
     );
     viewState.setBusy(false);
+  }
+
+  /// "Шалгах" on the sign-up verification sheet: only continue once the SMS
+  /// parser has received the code. Shows the server's message otherwise.
+  Future<bool> checkSignupCodeVerified() async {
+    final Result<Nothing, ApiException> result = await _authService().verifySignupCode(
+      phone: AppFunctions.phoneNumber,
+      code: AppFunctions.otpCode,
+    );
+    return result.on<Future<bool>>(
+      success: (_) async => true,
+      failure: (ApiException e) async {
+        await showAlertNotification(context(), message: e.message, icon: AppImages.warning_alert());
+        return false;
+      },
+    );
   }
 
   Future<void> sendCode() async {
@@ -230,6 +247,7 @@ final class AuthScreenController extends BaseScreenController<AuthScreenArgs> {
                   context(),
                   sendToPhoneNumber: result.data.sendToNumber,
                   verifyCode: result.data.otpCode,
+                  onCheck: checkSignupCodeVerified,
                   onVerify: () {
                     //login();
                     AppNavigation.gotoLoginPasswordRoute(

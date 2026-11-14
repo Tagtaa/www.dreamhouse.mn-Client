@@ -146,6 +146,14 @@ final class AuthService extends BaseService<AuthService> {
     );
   }
 
+  /// Checks that the SMS parser has received the sign-up [code] for [phone] (+976XXXXXXXX).
+  Future<Result<Nothing, ApiException>> verifySignupCode({
+    required String phone,
+    required String code,
+  }) {
+    return _apiService().auth.verifyCode(phone: phone, code: code);
+  }
+
   Future<Result<ForgotPasswordResponseModel, ApiException>> sendForgotPasswordCode({
     required String phone,
   }) async {

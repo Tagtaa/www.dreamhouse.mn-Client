@@ -18,11 +18,17 @@ class VerificationBottomSheet extends StatefulWidget {
   final VoidCallback? onVerify;
   final String verifyCode;
 
+  /// Runs when "Шалгах" is pressed. Return true to close the sheet and call
+  /// [onVerify]; false keeps the sheet open (the caller shows the error).
+  /// When null, the button closes the sheet straight away (previous behaviour).
+  final Future<bool> Function()? onCheck;
+
   const VerificationBottomSheet({
     super.key,
     required this.sendToPhoneNumber,
     this.onVerify,
     required this.verifyCode,
+    this.onCheck,
   });
 
   @override
@@ -31,6 +37,22 @@ class VerificationBottomSheet extends StatefulWidget {
 
 class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
   final TextEditingController _codeController = TextEditingController();
+  bool _isChecking = false;
+
+  Future<void> _onCheckPressed() async {
+    if (_isChecking) return;
+
+    if (widget.onCheck != null) {
+      setState(() => _isChecking = true);
+      final bool verified = await widget.onCheck!();
+      if (!mounted) return;
+      setState(() => _isChecking = false);
+      if (!verified) return; // stay on the sheet; caller already showed the error
+    }
+
+    widget.onVerify?.call();
+    if (mounted) Navigator.pop(context);
+  }
 
   @override
   void dispose() {
@@ -124,10 +146,8 @@ class _VerificationBottomSheetState extends State<VerificationBottomSheet> {
               AppButton.primaryLarge(
                 text: TextConstants.check,
                 isLongWidth: true,
-                onTap: () {
-                  widget.onVerify?.call();
-                  Navigator.pop(context);
-                },
+                isEnabled: !_isChecking,
+                onTap: _onCheckPressed,
               ),
 
               const SizedBox(height: AppSize.emptySize),
@@ -144,6 +164,7 @@ Future<void> showVerificationBottomSheet(
   required String sendToPhoneNumber,
   required String verifyCode,
   void Function()? onVerify,
+  Future<bool> Function()? onCheck,
 }) async {
   if (context != null && context.mounted) {
     AppNavigation.popRoute(context);
@@ -160,6 +181,7 @@ Future<void> showVerificationBottomSheet(
           sendToPhoneNumber: sendToPhoneNumber,
           verifyCode: verifyCode,
           onVerify: onVerify,
+          onCheck: onCheck,
         );
       },
     );

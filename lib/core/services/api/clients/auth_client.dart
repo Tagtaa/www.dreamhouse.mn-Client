@@ -86,6 +86,25 @@ final class AuthClient {
     }
   }
 
+  /// "Шалгах" on sign-up: succeeds only once the SMS parser has received [code]
+  /// from the user. [phone] is the full number as returned by send-code (+976XXXXXXXX).
+  Future<Result<Nothing, ApiException>> verifyCode({required String phone, required String code}) async {
+    try {
+      await _api.post(
+        ApiPaths.verifyCode,
+        data: <String, dynamic>{
+          'phone': phone,
+          'code': code,
+        },
+        // Server error messages in Mongolian (shown to the user as-is)
+        options: Options(headers: <String, dynamic>{'Accept-Language': 'mn'}),
+      );
+      return Success.nothing();
+    } catch (e) {
+      return Failure(ApiException.from(e));
+    }
+  }
+
   Future<Result<ForgotPasswordResponseModel, ApiException>> sendForgotPasswordCode(ForgotPasswordCodeRequestModel requestModel) async {
     try {
       final String number = '${TextConstants.loginPhoneCode}${requestModel.phone}';
