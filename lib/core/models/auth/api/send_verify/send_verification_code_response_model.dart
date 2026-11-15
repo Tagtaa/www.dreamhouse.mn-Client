@@ -26,6 +26,8 @@ final class VerificationData extends BaseModel {
   final String instructions;
   final int expiresIn;
   final String phone;
+  // false when "Phone verification" is turned off in the dashboard → skip the SMS step
+  final bool requiresSmsConfirmation;
 
   VerificationData({
     required this.otpCode,
@@ -33,6 +35,7 @@ final class VerificationData extends BaseModel {
     required this.instructions,
     required this.expiresIn,
     required this.phone,
+    this.requiresSmsConfirmation = true,
   });
 
   factory VerificationData.fromJson(Map<String, dynamic> json) {
@@ -42,6 +45,7 @@ final class VerificationData extends BaseModel {
       instructions: json['instructions'] as String,
       expiresIn: json['expiresIn'] as int,
       phone: json['phone'] as String,
+      requiresSmsConfirmation: json['requiresSmsConfirmation'] as bool? ?? true,
     );
   }
 }

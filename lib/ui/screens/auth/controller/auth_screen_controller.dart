@@ -190,7 +190,10 @@ final class AuthScreenController extends BaseScreenController<AuthScreenArgs> {
           },
           failure: (ApiException e) async {
             await showAlertNotification(context(), message: e.message, icon: AppImages.warning_alert());
-            if (e.code == 'SMS_PARSER_VERIFICATION_REQUIRED') {
+            if (_backendCode(e) == 'SMS_PARSER_VERIFICATION_REQUIRED' && AppFunctions.otpCode.isEmpty) {
+              // Verification was switched back on mid sign-up → start over from the phone step
+              AppNavigation.gotoLoginOptionRoute(context());
+            } else if (_backendCode(e) == 'SMS_PARSER_VERIFICATION_REQUIRED') {
               await showVerificationBottomSheet(
                 context(),
                 sendToPhoneNumber: AppFunctions.sendToNumber,
@@ -243,6 +246,17 @@ final class AuthScreenController extends BaseScreenController<AuthScreenArgs> {
                 AppFunctions.otpCode = result.data.otpCode;
                 AppFunctions.sendToNumber = result.data.sendToNumber;
                 AppFunctions.phoneNumber = result.data.phone;
+                // Phone verification turned off in the dashboard → choose a password right away
+                if (!result.data.requiresSmsConfirmation) {
+                  AppNavigation.gotoLoginPasswordRoute(
+                    context(),
+                    args: AuthScreenArgs(
+                      authState: AuthState.signUp,
+                      phone: result.data.phone,
+                    ),
+                  );
+                  return;
+                }
                 await showVerificationBottomSheet(
                   context(),
                   sendToPhoneNumber: result.data.sendToNumber,
@@ -262,11 +276,30 @@ final class AuthScreenController extends BaseScreenController<AuthScreenArgs> {
               },
               failure: (ApiException e) async {
                 await showAlertNotification(context(), message: e.message, icon: AppImages.warning_alert());
+                // Number already has an account (password set before) → enter that password
+                if (_backendCode(e) == 'USER_ALREADY_EXISTS') {
+                  AppNavigation.gotoLoginPasswordRoute(
+                    context(),
+                    args: AuthScreenArgs(
+                      authState: AuthState.login,
+                      phone: phoneController.text,
+                    ),
+                  );
+                }
               },
             );
           },
         );
     viewState.setBusy(false);
+  }
+
+  /// The backend's error `code` field, or null when the response has none.
+  String? _backendCode(ApiException e) {
+    try {
+      return e.code;
+    } catch (_) {
+      return null;
+    }
   }
 
   void resetFormData() {
