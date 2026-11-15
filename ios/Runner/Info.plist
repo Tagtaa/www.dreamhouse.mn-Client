@@ -51,5 +51,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- url_launcher: call material contact phone, open Google Map -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tel</string>
+		<string>https</string>
+	</array>
 </dict>
 </plist>

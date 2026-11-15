@@ -17,6 +17,7 @@ import '../../models/auth/api/signup/signup_request_model.dart';
 import '../../models/auth/api/subscription/purchase_membership_response_model.dart';
 import '../../models/auth/api/subscription/subscription_response_model.dart';
 import '../../models/result.dart';
+import '../../configs/constants/text_constants.dart';
 import '../api/api_service.dart';
 import '../base_service.dart';
 import '../local_storage/local_storage_service.dart';
@@ -33,6 +34,9 @@ final class AuthService extends BaseService<AuthService> {
 
   UserResponseModel? userResponse;
   bool isMember = false;
+
+  /// Deposit bank account shown on the recharge screen (updated from the server).
+  String bankAccount = TextConstants.khanBankAccount;
 
   @override
   Future<AuthService> init() async {
@@ -280,6 +284,18 @@ final class AuthService extends BaseService<AuthService> {
           failure: (ApiException e) => Failure(e),
         );
       },
+    );
+  }
+
+  /// Latest deposit bank account from the server; keeps the last known one on errors.
+  Future<String> loadBankAccount() async {
+    final Result<String, ApiException> result = await _apiService().auth.getBankAccount();
+    return result.on<String>(
+      success: (String account) {
+        bankAccount = account;
+        return account;
+      },
+      failure: (_) => bankAccount,
     );
   }
 

@@ -227,6 +227,21 @@ final class AuthClient {
     }
   }
 
+  /// Deposit (wallet top-up) bank account set in Dashboard → Settings → General Preferences.
+  Future<Result<String, ApiException>> getBankAccount() async {
+    try {
+      final Response<dynamic> response = await _api.get(ApiPaths.publicSettings);
+      final dynamic data = (response.data as Map<String, dynamic>?)?['data'];
+      final String? account = data is Map<String, dynamic> ? data['bankAccount'] as String? : null;
+      if (account == null || account.isEmpty) {
+        return Failure(ApiException.from(Exception('No bank account')));
+      }
+      return Success(account);
+    } catch (e) {
+      return Failure(ApiException.from(e));
+    }
+  }
+
   Future<Result<bool, ApiException>> getHealth() async {
     try {
       final Response<dynamic> response = await _api.get(

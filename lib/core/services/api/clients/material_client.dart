@@ -23,6 +23,7 @@ final class MaterialClient {
       'limit': limit,
       'category': category,
       'parentCategory': parentCategory,
+      'likedFirst': true,
     };
     if (query != null && query.trim().isNotEmpty) {
       queryParam.addAll(<String, dynamic>{'q': query});

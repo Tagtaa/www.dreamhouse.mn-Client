@@ -8,6 +8,7 @@ import '../../../../../../core/models/idea/list/idea_list_model.dart';
 import '../../../../../../core/routing/app_navigation.dart';
 import '../../../../../../core/utils/extensions/size_extensions.dart';
 import '../../../../../components/widgets/custom_image_network.dart';
+import '../../../../../components/widgets/fixed_lines_text.dart';
 import '../../../../../components/widgets/gesture_detector.dart';
 
 class IdeaSearchedItem extends StatelessWidget {
@@ -47,7 +48,8 @@ class IdeaSearchedItem extends StatelessWidget {
 
             const SizedBox(height: AppSize.emptySizeLowest),
 
-            Text(
+            // Title always takes 3 lines so long titles don't move the rest of the item
+            FixedLinesText(
               idea.title ?? '',
               style: AppTextStyles.titleMedium(),
             ),
@@ -93,13 +95,15 @@ class IdeaSearchedItem extends StatelessWidget {
             ),
             const SizedBox(height: AppSize.emptySizeLowest),
 
-            Text(
-              '${idea.totalCost} ₮',
-              style: AppTextStyles.labelSmall(
-                color: AppColors.onSurface,
-                fontWeight: FontWeight.w500,
+            // Premium ideas: the API sends the total cost to buyers only
+            if (idea.totalCost != null)
+              Text(
+                '${idea.totalCost} ₮',
+                style: AppTextStyles.labelSmall(
+                  color: AppColors.onSurface,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
             const SizedBox(height: AppSize.emptySizeLowest),
           ],
         ),

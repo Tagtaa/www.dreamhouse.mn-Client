@@ -393,6 +393,8 @@ class TextConstants {
   static const String validatorUnderfloorWidth = 'шалан доорх өргөн';
 
   static const String onePiece = '1 ширхэг';
+  // Size abbreviation: length × width × height
+  static const String sizeLwh = 'Ур×Өр×Өн';
   static const String blockPriceTitle = 'Үнэ / 1 ширхэг';
   static const String validatorBlockLength = 'блокын урт';
   static const String validatorBlockWidth = 'блокын өргөн';

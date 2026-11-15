@@ -10,6 +10,7 @@ import '../../../../../../core/routing/app_navigation.dart';
 import '../../../../../../core/utils/extensions/size_extensions.dart';
 import '../../../../../components/buttons/custom_buttons.dart';
 import '../../../../../components/widgets/custom_image_network.dart';
+import '../../../../../components/widgets/fixed_lines_text.dart';
 
 const double _buttonWidth = 240.0;
 const double _buttonTabletWidth = 400.0;
@@ -208,7 +209,8 @@ class PurchasedIdeaCard extends StatelessWidget {
 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSize.padding),
-                child: Text(
+                // Title always takes 3 lines so long titles don't move the rest of the card
+                child: FixedLinesText(
                   idea.title ?? '',
                   style: AppTextStyles.headlineMedium(fontWeight: FontWeight.w700),
                 ),

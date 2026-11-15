@@ -6,6 +6,8 @@ import '../../../../../../core/configs/theme/app_colors.dart';
 import '../../../../../../core/configs/theme/app_text_styles.dart';
 import '../../../../../core/configs/constants/app_images.dart';
 import '../../../../../core/configs/constants/text_constants.dart';
+import '../../../../../core/services/auth/auth_service.dart';
+import '../../../../../core/init/app_locator.dart';
 import '../../../../../core/utils/extensions/size_extensions.dart';
 import '../../../../components/widgets/custom_back_button.dart';
 import 'recharge_screen_args.dart';
@@ -127,10 +129,14 @@ class RechargeScreenView extends StatelessWidget {
             ),
             const SizedBox(height: AppSize.emptySize),
 
-            infoContainer(
-              TextConstants.khanBankAccount,
-              TextConstants.khanBankName,
-              TextConstants.khanBankDescription,
+            FutureBuilder<String>(
+              future: ServiceLocator.get<AuthService>().loadBankAccount(),
+              initialData: ServiceLocator.get<AuthService>().bankAccount,
+              builder: (BuildContext context, AsyncSnapshot<String> snapshot) => infoContainer(
+                snapshot.data ?? TextConstants.khanBankAccount,
+                TextConstants.khanBankName,
+                TextConstants.khanBankDescription,
+              ),
             ),
             const SizedBox(height: AppSize.emptySizeLow),
             infoContainer(

@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../../../../../core/init/app_locator.dart';
+import '../../../../../../core/services/auth/auth_service.dart';
 import '../../../../../../core/configs/constants/app_images.dart';
 import '../../../../../../core/configs/constants/app_size.dart';
 import '../../../../../../core/configs/constants/text_constants.dart';
@@ -134,13 +138,15 @@ class _MaterialItemCardState extends State<MaterialItemCard> {
 
                         Row(
                           children: <Widget>[
-                            Text(
-                              '${widget.materialItem.price}₮',
-                              style: AppTextStyles.headlineMedium(fontWeight: FontWeight.w600),
-                            ),
+                            // Material prices are shown to users with an active membership only
+                            if (ServiceLocator.get<AuthService>().isMember)
+                              Text(
+                                '${widget.materialItem.price}₮',
+                                style: AppTextStyles.headlineMedium(fontWeight: FontWeight.w600),
+                              ),
                             const Spacer(),
                             Text(
-                              '1 ${TextConstants.onePiece} / ${widget.materialItem.length}x${widget.materialItem.width}x${widget.materialItem.height}${widget.materialItem.unit}',
+                              '${TextConstants.onePiece} / ${TextConstants.sizeLwh}: ${widget.materialItem.length}×${widget.materialItem.width}×${widget.materialItem.height}${widget.materialItem.unit}',
                               style: AppTextStyles.labelSmall(
                                 color: AppColors.inverseSurface,
                               ),
@@ -242,8 +248,20 @@ class _MaterialItemCardState extends State<MaterialItemCard> {
                             children: <Widget>[
                               Padding(
                                 padding: const EdgeInsets.all(AppSize.padding),
-                                child: Text(widget.materialItem.description ?? ''),
+                                // Description from the dashboard editor (HTML: paragraphs, lists, bold...)
+                                child: Html(
+                                  data: widget.materialItem.description ?? '',
+                                  style: <String, Style>{
+                                    'body': Style(margin: Margins.zero, padding: HtmlPaddings.zero),
+                                    'p': Style(margin: Margins.only(bottom: 8)),
+                                  },
+                                ),
                               ),
+                              // Where to buy (members only — the API leaves it out for others)
+                              if (ServiceLocator.get<AuthService>().isMember && !(widget.materialItem.contact?.isEmpty ?? true))
+                                _ContactView(contact: widget.materialItem.contact!)
+                              else if (!ServiceLocator.get<AuthService>().isMember)
+                                const _ContactLockedView(),
                               const SizedBox(height: AppSize.paddingLow),
                             ],
                           )
@@ -264,6 +282,105 @@ class _MaterialItemCardState extends State<MaterialItemCard> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+
+/// Phone (tap to call), address and a button that opens the Google Map.
+class _ContactView extends StatelessWidget {
+  final MaterialContact contact;
+
+  const _ContactView({required this.contact});
+
+  Future<void> _open(Uri uri) async {
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final String phone = contact.phone ?? '';
+    final String address = contact.address ?? '';
+    final String map = contact.mapEmbedUrl ?? '';
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSize.padding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text('Холбоо барих', style: AppTextStyles.labelSmall(color: AppColors.inverseSurface)),
+          const SizedBox(height: AppSize.paddingLow),
+          if (phone.isNotEmpty)
+            InkWell(
+              onTap: () => _open(Uri(scheme: 'tel', path: phone.replaceAll(' ', ''))),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  children: <Widget>[
+                    const Icon(Icons.phone_outlined, size: 18),
+                    const SizedBox(width: 8),
+                    Text(phone, style: AppTextStyles.labelMedium(fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ),
+            ),
+          if (address.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  const Icon(Icons.place_outlined, size: 18),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(address, style: AppTextStyles.labelMedium())),
+                ],
+              ),
+            ),
+          if (map.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: OutlinedButton.icon(
+                onPressed: () => _open(Uri.parse(map)),
+                icon: const Icon(Icons.map_outlined, size: 18),
+                label: const Text('Газрын зураг нээх'),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+
+/// Shown instead of the contact details to users without an active membership.
+class _ContactLockedView extends StatelessWidget {
+  const _ContactLockedView();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSize.padding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text('Холбоо барих', style: AppTextStyles.labelSmall(color: AppColors.inverseSurface)),
+          const SizedBox(height: AppSize.paddingLow),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              const Icon(Icons.phone_outlined, size: 18),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Гишүүнчлэл авсан хэрэглэгчид материал худалдан авах холбоо барих мэдээллийг харах боломжтой',
+                  style: AppTextStyles.labelMedium(),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

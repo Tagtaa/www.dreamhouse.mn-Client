@@ -49,7 +49,25 @@ final class MaterialsData {
   };
 }
 
+/// Where to buy the material — the API sends it to users with an active membership only.
+final class MaterialContact {
+  final String? phone;
+  final String? address;
+  final String? mapEmbedUrl;
+
+  const MaterialContact({this.phone, this.address, this.mapEmbedUrl});
+
+  bool get isEmpty => (phone ?? '').isEmpty && (address ?? '').isEmpty && (mapEmbedUrl ?? '').isEmpty;
+
+  factory MaterialContact.fromJson(Map<String, dynamic> json) => MaterialContact(
+    phone: json['phone'] as String?,
+    address: json['address'] as String?,
+    mapEmbedUrl: json['mapEmbedUrl'] as String?,
+  );
+}
+
 final class MaterialItem {
+  final MaterialContact? contact;
   final CostPerUnit? costPerUnit;
   final Supplier? supplier;
   final String? id;
@@ -106,6 +124,7 @@ final class MaterialItem {
     this.createdAt,
     this.updatedAt,
     this.formattedPrice,
+    this.contact,
   });
 
   factory MaterialItem.fromJson(Map<String, dynamic> json) {
@@ -139,6 +158,7 @@ final class MaterialItem {
       createdAt: json['createdAt'] != null ? DateTime.tryParse(json['createdAt'] as String) : null,
       updatedAt: json['updatedAt'] != null ? DateTime.tryParse(json['updatedAt'] as String) : null,
       formattedPrice: json['formattedPrice'] as String?,
+      contact: json['contact'] is Map<String, dynamic> ? MaterialContact.fromJson(json['contact'] as Map<String, dynamic>) : null,
     );
   }
 

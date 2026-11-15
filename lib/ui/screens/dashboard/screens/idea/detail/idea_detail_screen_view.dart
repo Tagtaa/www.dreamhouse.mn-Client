@@ -301,7 +301,10 @@ final class _IdeaDetailScreenViewState extends BaseScreenViewState<IdeaDetailScr
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: AppSize.paddingHigh, vertical: AppSize.padding),
-                          child: Container(
+                          // Premium ideas not bought yet: the API leaves out the total and materials list
+                          child: ideaDetail.value?.data.idea.totalCost == null
+                              ? const _IdeaLockedNotice()
+                              : Container(
                             decoration: BoxDecoration(
                               border: Border.all(
                                 color: AppColors.borderColor,
@@ -425,4 +428,36 @@ Widget titleRow({
       ),
     ],
   );
+}
+
+
+/// Shown in place of the materials list and total cost until the premium idea is bought.
+class _IdeaLockedNotice extends StatelessWidget {
+  const _IdeaLockedNotice();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSize.paddingHigh),
+      decoration: BoxDecoration(
+        color: AppColors.secondaryBackground,
+        border: Border.all(color: AppColors.borderColor, width: AppSize.one),
+        borderRadius: BorderRadius.circular(AppSize.radius),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          const Icon(Icons.lock_outline, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Худалдаж авснаар материалын жагсаалт болон худалдаж авах газруудын холбоо барих мэдээллийг харах боломжтой болно.',
+              style: AppTextStyles.labelMedium(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

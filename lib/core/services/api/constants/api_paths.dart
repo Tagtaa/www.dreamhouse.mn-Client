@@ -3,6 +3,8 @@ abstract final class ApiPaths {
 
   // Health & Welcome
   static const String health = '/health';
+  // Website/app settings from the dashboard (deposit bank account, app links …)
+  static const String publicSettings = '/public-settings';
   static const String welcome = '/';
 
   // Auth Routes

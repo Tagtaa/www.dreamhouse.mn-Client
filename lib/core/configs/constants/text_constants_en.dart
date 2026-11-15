@@ -388,6 +388,8 @@ class TextConstantsEn {
   static const String validatorUnderfloorWidth = 'underfloor width';
 
   static const String onePiece = '1 piece';
+  // Size abbreviation: length × width × height
+  static const String sizeLwh = 'L×W×H';
   static const String blockPriceTitle = 'Price / 1 piece';
   static const String validatorBlockLength = 'block length';
   static const String validatorBlockWidth = 'block width';

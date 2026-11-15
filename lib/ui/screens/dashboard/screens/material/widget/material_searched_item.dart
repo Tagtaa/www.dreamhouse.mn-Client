@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../../../../core/init/app_locator.dart';
+import '../../../../../../core/services/auth/auth_service.dart';
 
 import '../../../../../../../core/configs/constants/app_icons.dart';
 import '../../../../../../../core/configs/constants/app_size.dart';
@@ -73,13 +75,15 @@ class MaterialSearchedItem extends StatelessWidget {
               ),
               const SizedBox(height: AppSize.emptySizeLowest),
 
-              Text(
-                '${material.price} ₮',
-                style: AppTextStyles.labelSmall(
-                  color: AppColors.onSurface,
-                  fontWeight: FontWeight.w500,
+              // Material prices are shown to users with an active membership only
+              if (ServiceLocator.get<AuthService>().isMember)
+                Text(
+                  '${material.price} ₮',
+                  style: AppTextStyles.labelSmall(
+                    color: AppColors.onSurface,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
               const SizedBox(height: AppSize.emptySizeLowest),
             ],
           ),
