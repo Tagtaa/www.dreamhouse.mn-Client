@@ -105,7 +105,7 @@ final class InnerWallEstimationScreenController extends BaseScreenController<Def
     late final double thicknessM;
 
     if (selectedTypeModel.value?.key == TextConstants.customType) {
-      thicknessM = double.tryParse(wallThicknessPieceController.text) ?? 1.0 / 100.0;
+      thicknessM = (double.tryParse(wallThicknessPieceController.text) ?? 1.0) / 100.0;
       materialWidth = _cmToM3(double.tryParse(blockWidthController.text) ?? 1.0);
       materialLength = _cmToM3(double.tryParse(blockLengthController.text) ?? 1.0);
       materialHeight = _cmToM3(double.tryParse(blockHeightController.text) ?? 1.0);

@@ -150,14 +150,11 @@ final class WallEstimationScreenController extends BaseScreenController<DefaultS
     final double W = _cmToM(roomWidthController.text);
     final double H = _cmToM(roomHeightController.text);
 
-    final double winH = _cmToM(windowHeightController.text);
-    final double winW = _cmToM(windowWidthController.text);
-    final double doorL = _cmToM(doorHeightController.text);
-    final double doorW = _cmToM(doorWidthController.text);
-
-    windowList.value.add(DoorWindowModel(width: double.tryParse(windowWidthController.text) ?? 0, height: double.tryParse(windowHeightController.text) ?? 0));
-
-    doorList.value.add(DoorWindowModel(width: double.tryParse(doorWidthController.text) ?? 0, height: double.tryParse(doorHeightController.text) ?? 0));
+    // A door/window typed in but not yet added with "Add" still counts.
+    // These only add when both fields are valid numbers, then clear the fields,
+    // so pressing Calculate again never adds empty or duplicate entries.
+    onAddWindowTap();
+    onAddDoorTap();
 
     late final double thicknessM;
     late final double materialWidth;
@@ -165,7 +162,7 @@ final class WallEstimationScreenController extends BaseScreenController<DefaultS
     late final double materialHeight;
 
     if (selectedTypeModel.value?.key == TextConstants.customType) {
-      thicknessM = double.tryParse(wallThicknessPieceController.text) ?? 1.0 / 100.0;
+      thicknessM = (double.tryParse(wallThicknessPieceController.text) ?? 1.0) / 100.0;
       materialWidth = _cmToM3(double.tryParse(blockWidthController.text) ?? 1.0);
       materialLength = _cmToM3(double.tryParse(blockLengthController.text) ?? 1.0);
       materialHeight = _cmToM3(double.tryParse(blockHeightController.text) ?? 1.0);
@@ -191,7 +188,9 @@ final class WallEstimationScreenController extends BaseScreenController<DefaultS
     }
 
     final double totalWallArea = 2 * (L + W) * H;
-    final double openingsArea = (winH * winW) + (doorL * doorW);
+    // Door/window sizes are stored in cm; convert each to m².
+    double openingArea(DoorWindowModel o) => (o.width / 100.0) * (o.height / 100.0);
+    final double openingsArea = <DoorWindowModel>[...windowList.value, ...doorList.value].fold(0.0, (double sum, DoorWindowModel o) => sum + openingArea(o));
     final double netWallArea = (totalWallArea - openingsArea).clamp(0, double.infinity);
     final double wallVolumeM3 = netWallArea * thicknessM;
     totalVolume = wallVolumeM3;

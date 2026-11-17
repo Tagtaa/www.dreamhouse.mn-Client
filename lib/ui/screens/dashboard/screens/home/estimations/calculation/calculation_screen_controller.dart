@@ -61,26 +61,25 @@ final class CalculationScreenController extends BaseScreenController<Calculation
   }
 
   void calculationItemCount() {
-    if (totalArea != null) {
-      final double materialWidth = _cmToM3(selectedMaterialModel?.width?.toDouble() ?? 1.0);
-      final double materialLength = _cmToM3(selectedMaterialModel?.length?.toDouble() ?? 1.0);
+    // Custom blocks: the estimation screen stores sizes already in metres and
+    // the user's own price; a selected material stores sizes in cm.
+    final CalculationCustomModel? custom = calculationCustomModel;
+    final double materialWidth = custom != null ? (custom.blockWidth ?? 0.01) : _cmToM3(selectedMaterialModel?.width?.toDouble() ?? 1.0);
+    final double materialLength = custom != null ? (custom.blockLength ?? 0.01) : _cmToM3(selectedMaterialModel?.length?.toDouble() ?? 1.0);
+    final double materialHeight = custom != null ? (custom.blockHeight ?? 0.01) : _cmToM3(selectedMaterialModel?.height?.toDouble() ?? 1.0);
+    final double materialPrice = (custom != null ? (custom.price ?? priceOneBlock) : selectedMaterialModel?.price?.toDouble()) ?? 1.0;
 
+    if (totalArea != null) {
       final double materialArea = materialWidth * materialLength;
       final double needMaterial = totalArea! / materialArea;
       materialItemCount(set: () => needMaterial.ceil());
-      final double? materialPrice = selectedMaterialModel?.price?.toDouble();
-      totalPrice(set: () => materialItemCount.value * (materialPrice ?? 1.0));
+      totalPrice(set: () => materialItemCount.value * materialPrice);
     }
     if (totalVolume != null) {
-      final double materialWidth = _cmToM3(selectedMaterialModel?.width?.toDouble() ?? 1.0);
-      final double materialLength = _cmToM3(selectedMaterialModel?.length?.toDouble() ?? 1.0);
-      final double materialHeight = _cmToM3(selectedMaterialModel?.height?.toDouble() ?? 1.0);
-
       final double materialVolume = materialWidth * materialLength * materialHeight;
       final double needMaterial = totalVolume! / materialVolume;
       materialItemCount(set: () => needMaterial.ceil());
-      final double? materialPrice = selectedMaterialModel?.price?.toDouble();
-      totalPrice(set: () => materialItemCount.value * (materialPrice ?? 1.0));
+      totalPrice(set: () => materialItemCount.value * materialPrice);
     }
   }
 
