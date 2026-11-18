@@ -83,6 +83,8 @@ final class MaterialItem {
   final String? description;
   final List<String>? images;
   final List<ThicknessOption>? thicknessOptions;
+  /// This material's own ingredients (each material has its own list).
+  final List<Ingredient>? ingredients;
   final int? likeCount;
   final List<String>? likedBy;
   final bool? isLiked;
@@ -112,6 +114,7 @@ final class MaterialItem {
     this.description,
     this.images,
     this.thicknessOptions,
+    this.ingredients,
     this.likeCount,
     this.likedBy,
     this.isLiked,
@@ -146,6 +149,9 @@ final class MaterialItem {
       thicknessOptions: json['thicknessOptions'] != null
           ? (json['thicknessOptions'] as List<dynamic>?)?.where((e) => e != null).map((e) => ThicknessOption.fromJson(e as Map<String, dynamic>)).toList()
           : null,
+      ingredients: json['ingredients'] is List<dynamic>
+          ? (json['ingredients'] as List<dynamic>).whereType<Map<String, dynamic>>().map(Ingredient.fromJson).toList()
+          : null,
       likeCount: json['likeCount'] as int?,
       likedBy: (json['likedBy'] as List<dynamic>?)?.cast<String>(),
       isLiked: json['isLiked'] as bool?,
@@ -178,6 +184,7 @@ final class MaterialItem {
     'description': description,
     'images': images,
     'thicknessOptions': thicknessOptions?.map((ThicknessOption e) => e.toJson()).toList(),
+    'ingredients': ingredients?.map((Ingredient e) => e.toJson()).toList(),
     'likeCount': likeCount,
     'likedBy': likedBy,
     'isLiked': isLiked,
@@ -192,6 +199,10 @@ final class MaterialItem {
     'formattedPrice': formattedPrice,
     'id': id, // JSON'da hem _id hem de id var
   };
+
+  /// Ingredients used in calculations: the material's own list, or the category list
+  /// sent by older API versions.
+  List<Ingredient>? get calculationIngredients => ingredients ?? category?.ingredients;
 
   MaterialItem copyWith({
     CostPerUnit? costPerUnit,
@@ -209,6 +220,7 @@ final class MaterialItem {
     String? description,
     List<String>? images,
     List<ThicknessOption>? thicknessOptions,
+    List<Ingredient>? ingredients,
     int? likeCount,
     List<String>? likedBy,
     bool? isLiked,
@@ -238,6 +250,7 @@ final class MaterialItem {
       description: description ?? this.description,
       images: images ?? this.images,
       thicknessOptions: thicknessOptions ?? this.thicknessOptions,
+      ingredients: ingredients ?? this.ingredients,
       likeCount: likeCount ?? this.likeCount,
       likedBy: likedBy ?? this.likedBy,
       isLiked: isLiked ?? this.isLiked,

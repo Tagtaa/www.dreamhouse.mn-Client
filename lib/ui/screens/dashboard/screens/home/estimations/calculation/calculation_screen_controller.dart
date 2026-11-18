@@ -84,7 +84,8 @@ final class CalculationScreenController extends BaseScreenController<Calculation
   }
 
   void newCalculateIngredientsPrice() {
-    final List<Ingredient>? ingredients = selectedMaterialModel?.category?.ingredients;
+    // Each material has its own ingredients
+    final List<Ingredient>? ingredients = selectedMaterialModel?.calculationIngredients;
 
     if (ingredients != null) {
       ingredientsList(set: () => ingredients);
